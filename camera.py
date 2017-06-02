@@ -1,3 +1,5 @@
+#!/usr/python3
+
 import sys
 import inspect
 import numpy as np
@@ -85,7 +87,7 @@ class Interface(QtGui.QWidget):
             pixmap = QtGui.QPixmap(image)
             self.label_image.setPixmap(pixmap)
         else:
-            print 'This mode does not work for now'
+            print('This mode does not work for now')
 
     def startvideoCaptureThread(self):
         self.captureThread = Thread(None, self.videoCapture, 'thread-capture')
@@ -109,7 +111,7 @@ class Interface(QtGui.QWidget):
     def videoCapture(self):
         self.captureRunning = True
 
-        print 'Begin of Thread - videoCapture'
+        print('Begin of Thread - videoCapture')
         capture = cv2.VideoCapture(0)
 
         while self.captureRunning:
@@ -133,7 +135,7 @@ class Interface(QtGui.QWidget):
         # When everything done, release the capture
         capture.release()
         cv2.destroyAllWindows()
-        print 'End of thread - videoCapture'
+        print('End of thread - videoCapture')
 
     def quit(self):
         self.stopVideoCaptureThread()
