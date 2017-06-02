@@ -8,10 +8,10 @@ from threading import Thread, Lock
 import time
 import cv2
 from PySide import QtCore, QtGui
+import getopt
 
 SCREEN_RESOLUTION = [1920, 1080]
 VIDEO_RESOLUTION = [640, 480]
-
 
 class QtSignal(QtCore.QObject):
     signal = QtCore.Signal(object)
@@ -143,6 +143,26 @@ class Interface(QtGui.QWidget):
 
 
 def main():
+    # handle parameters for screen an video resolution
+    global SCREEN_RESOLUTION
+    global VIDEO_RESOLUTION
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], "hs:v:", "")
+    except getopt.GetoptError as err:
+        print(err)
+    for o,a in opts:
+        if o == "-s":
+            SCREEN_RESOLUTION = [ int(x) for x in a.split("x") ]
+        elif o == "-v":
+            VIDEO_RESOLUTION = [ int(x) for x in a.split("x") ]
+        elif o == "-h":
+            print("Usage:",sys.argv[0], "[options...]")
+            print("oOptions:")
+            print("-h               display help")
+            print("-s <int>x<int>   screen resolution")
+            print("-v <int>x<int>   video resolution")
+            sys.exit(0)
+
     app = QtGui.QApplication(sys.argv)
     interface = Interface()
 
