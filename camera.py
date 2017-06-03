@@ -7,8 +7,17 @@ import time
 import cv2
 from PySide import QtCore, QtGui
 
+# Global definitions
 SCREEN_RESOLUTION = [1920, 1080]
 VIDEO_RESOLUTION = [640, 480]
+try:
+    if os.uname()[1] == 'raspberrypi':
+        PLATFORM = 'raspPi'
+    else:
+        PLATFORM = sys.platform
+except AttributeError:
+    PLATFORM = sys.platform
+print('Running on', PLATFORM)
 
 
 class QtSignal(QtCore.QObject):
