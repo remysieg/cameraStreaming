@@ -1,11 +1,19 @@
-import sys
-import inspect
-import numpy as np
+# Camera.py
+# This script open a qt window where one can display the computer's webcam stream. Basic treatments can be performed on
+# those images.
+#
+# Software versions
+# This script was developed using: python 3.5.3 / numpy 1.12.1 / opencv3 3.1.0 / pyqt 5.6.0
+
+# Base packages
+import os, sys
+import time
 from threading import Thread, Lock
 
-import time
+# Downloaded packages
+import numpy as np
 import cv2
-from PySide import QtCore, QtGui
+from PyQt5 import QtCore, QtGui, QtWidgets
 
 # Global definitions
 SCREEN_RESOLUTION = [1920, 1080]
@@ -21,10 +29,11 @@ print('Running on', PLATFORM)
 
 
 class QtSignal(QtCore.QObject):
-    signal = QtCore.Signal(object)
+    # FIXME: try to get rid of this (i.e. better understand Qt signal process)
+    signal = QtCore.pyqtSignal(object)
 
 
-class Interface(QtGui.QWidget):
+class Interface(QtWidgets.QWidget):
 
     def __init__(self):
         super(Interface, self).__init__()
@@ -35,47 +44,48 @@ class Interface(QtGui.QWidget):
         self.captureThread = None
         self.captureRunning = False
         self.captureMode = 'raw'
+
         self.newImageSig = QtSignal()
         self.newImageSig.signal.connect(self.updateImage)
 
-        self.iniUI()
+        self.initUI()
 
-    def iniUI(self):
-        self.setGeometry((SCREEN_RESOLUTION[0]-self.size[0])/2,
-                         (SCREEN_RESOLUTION[1]-self.size[1])/2,
+    def initUI(self):
+        self.setGeometry(int((SCREEN_RESOLUTION[0]-self.size[0])/2),
+                         int((SCREEN_RESOLUTION[1]-self.size[1])/2),
                          self.size[0], self.size[1])
         self.setWindowTitle('Camera')
 
-        button_quit = QtGui.QPushButton('Quit', self)
+        button_quit = QtWidgets.QPushButton('Quit', self)
         button_quit.setGeometry(10, 10, 100, 30)
-        QtCore.QObject.connect(button_quit, QtCore.SIGNAL('clicked()'), self.quit)
+        button_quit.clicked.connect(self.quit)
 
-        self.button_connect = QtGui.QPushButton('Connect', self)
+        self.button_connect = QtWidgets.QPushButton('Connect', self)
         self.button_connect.setGeometry(10, 50, 100, 30)
-        QtCore.QObject.connect(self.button_connect, QtCore.SIGNAL('clicked()'), self.connect)
+        self.button_connect.clicked.connect(self.connect)
 
-        checkboxeGroup_mode = QtGui.QButtonGroup(self)
-        checkboxeGroup_mode.setObjectName('Treatment')
+        checkboxGroup_mode = QtWidgets.QButtonGroup(self)
+        checkboxGroup_mode.setObjectName('Treatment')
 
-        checkbox_raw = QtGui.QCheckBox('Raw image', self)
+        checkbox_raw = QtWidgets.QCheckBox('Raw image', self)
         checkbox_raw.setChecked(True)
         checkbox_raw.setGeometry(10, 130, 100, 30)
-        QtCore.QObject.connect(checkbox_raw, QtCore.SIGNAL('stateChanged(int)'), self.updateMode)
-        checkboxeGroup_mode.addButton(checkbox_raw)
+        checkbox_raw.stateChanged.connect(self.updateMode)
+        checkboxGroup_mode.addButton(checkbox_raw)
 
-        checkbox_gray = QtGui.QCheckBox('Gray image', self)
+        checkbox_gray = QtWidgets.QCheckBox('Gray image', self)
         checkbox_gray.setGeometry(10, 170, 100, 30)
-        QtCore.QObject.connect(checkbox_raw, QtCore.SIGNAL('stateChanged(int)'), self.updateMode)
-        checkboxeGroup_mode.addButton(checkbox_gray)
+        checkbox_gray.stateChanged.connect(self.updateMode)
+        checkboxGroup_mode.addButton(checkbox_gray)
 
-        checkbox_edges = QtGui.QCheckBox('Canny edges detection', self)
+        checkbox_edges = QtWidgets.QCheckBox('Canny edges detection', self)
         checkbox_edges.setGeometry(10, 210, 100, 30)
-        checkboxeGroup_mode.addButton(checkbox_edges)
-        QtCore.QObject.connect(checkbox_raw, QtCore.SIGNAL('stateChanged(int)'), self.updateMode)
+        checkbox_edges.stateChanged.connect(self.updateMode)
+        checkboxGroup_mode.addButton(checkbox_edges)
 
         self.modeCheckBoxes = {'raw': checkbox_raw, 'gray': checkbox_gray, 'edges': checkbox_edges}
 
-        self.label_image = QtGui.QLabel(self)
+        self.label_image = QtWidgets.QLabel(self)
         self.label_image.setGeometry(120, 10, 640, 480)
 
         self.show()
@@ -86,7 +96,6 @@ class Interface(QtGui.QWidget):
                 self.captureMode = mode
 
     def updateImage(self, frame):
-        # FIXME: create cases for other modes
         if self.captureMode == 'raw':
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             image = QtGui.QImage(frame, frame.shape[1], frame.shape[0], frame.shape[1]*3,
@@ -94,7 +103,11 @@ class Interface(QtGui.QWidget):
             pixmap = QtGui.QPixmap(image)
             self.label_image.setPixmap(pixmap)
         else:
-            print 'This mode does not work for now'
+            # FIXME: make other modes work
+            print('This mode is not supported')
+            # image = QtGui.QImage(frame, frame.shape[1], frame.shape[0], frame.shape[1]*3,
+            #                      QtGui.QImage.Format_RGB888)
+            # pixmap = QtGui.QPixmap(image)
 
     def startvideoCaptureThread(self):
         self.captureThread = Thread(None, self.videoCapture, 'thread-capture')
@@ -118,7 +131,7 @@ class Interface(QtGui.QWidget):
     def videoCapture(self):
         self.captureRunning = True
 
-        print 'Begin of Thread - videoCapture'
+        print('Begin of Thread - videoCapture')
         capture = cv2.VideoCapture(0)
 
         while self.captureRunning:
@@ -142,7 +155,7 @@ class Interface(QtGui.QWidget):
         # When everything done, release the capture
         capture.release()
         cv2.destroyAllWindows()
-        print 'End of thread - videoCapture'
+        print('End of thread - videoCapture')
 
     def quit(self):
         self.stopVideoCaptureThread()
@@ -150,7 +163,7 @@ class Interface(QtGui.QWidget):
 
 
 def main():
-    app = QtGui.QApplication(sys.argv)
+    app = QtWidgets.QApplication(sys.argv)
     interface = Interface()
 
     sys.exit(app.exec_())
