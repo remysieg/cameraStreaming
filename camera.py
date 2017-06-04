@@ -183,7 +183,7 @@ def main():
             print("-v <int>x<int>   video resolution")
             sys.exit(0)
 
-    app = QtGui.QApplication(sys.argv)
+    app = QtWidgets.QApplication(sys.argv)
     interface = Interface()
 
     sys.exit(app.exec_())
