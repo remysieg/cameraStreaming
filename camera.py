@@ -158,9 +158,12 @@ class Interface(QtWidgets.QWidget):
 
         while self.captureRunning:
             # Capture one frame
-            # FIXME: check what the 'success' variable gets exactly
             time.sleep(0.05)
             success, frame = capture.read()
+            if not success:
+                print('[videoCapture] No frame was captured')
+                continue
+
             # Operations on frame
             if self.captureMode == 'edges':
                 frame = cv2.Canny(frame, 100, 200)
