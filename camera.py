@@ -15,7 +15,7 @@ from threading import Thread, Lock
 # Downloaded packages
 import numpy as np
 import cv2
-from PySide import QtCore, QtGui
+from PyQt5 import QtCore, QtGui, QtWidgets
 
 # Global definitions
 SCREEN_RESOLUTION = [1920, 1080]
