@@ -45,7 +45,7 @@ class QtSignal(QtCore.QObject):
 class Interface(QtWidgets.QWidget):
     def __init__(self):
         super(Interface, self).__init__()
-        self.size = [800, 600]
+        self.size = [850, 500]
         self.button_connect = None
         self.label_image = None
 
@@ -80,17 +80,17 @@ class Interface(QtWidgets.QWidget):
 
         checkbox_raw = QtWidgets.QCheckBox('Raw image', self)
         checkbox_raw.setChecked(True)
-        checkbox_raw.setGeometry(10, 130, 100, 30)
+        checkbox_raw.setGeometry(10, 130, 180, 30)
         checkbox_raw.stateChanged.connect(self.updateMode)
         checkboxGroup_mode.addButton(checkbox_raw)
 
         checkbox_gray = QtWidgets.QCheckBox('Gray image', self)
-        checkbox_gray.setGeometry(10, 170, 100, 30)
+        checkbox_gray.setGeometry(10, 170, 180, 30)
         checkbox_gray.stateChanged.connect(self.updateMode)
         checkboxGroup_mode.addButton(checkbox_gray)
 
         checkbox_edges = QtWidgets.QCheckBox('Canny edges detection', self)
-        checkbox_edges.setGeometry(10, 210, 100, 30)
+        checkbox_edges.setGeometry(10, 210, 180, 30)
         checkbox_edges.stateChanged.connect(self.updateMode)
         checkboxGroup_mode.addButton(checkbox_edges)
 
@@ -98,7 +98,7 @@ class Interface(QtWidgets.QWidget):
 
         # Init QLabel to display images
         self.label_image = QtWidgets.QLabel(self)
-        self.label_image.setGeometry(120, 10, 640, 480)
+        self.label_image.setGeometry(200, 10, 640, 480)
 
         self.show()
 
