@@ -11,6 +11,7 @@ import os, sys
 import time
 import getopt
 from threading import Thread, Lock
+from copy import deepcopy
 
 # Downloaded packages
 import numpy as np
@@ -94,7 +95,13 @@ class Interface(QtWidgets.QWidget):
         checkbox_edges.stateChanged.connect(self.updateMode)
         checkboxGroup_mode.addButton(checkbox_edges)
 
-        self.modeCheckBoxes = {'raw': checkbox_raw, 'gray': checkbox_gray, 'edges': checkbox_edges}
+        checkbox_blur = QtWidgets.QCheckBox('Blurred image', self)
+        checkbox_blur.setGeometry(10, 250, 180, 30)
+        checkbox_blur.stateChanged.connect(self.updateMode)
+        checkboxGroup_mode.addButton(checkbox_blur)
+
+        self.modeCheckBoxes = {'raw': checkbox_raw, 'gray': checkbox_gray, 'edges': checkbox_edges,
+                               'blur': checkbox_blur}
 
         # Init QLabel to display images
         self.label_image = QtWidgets.QLabel(self)
@@ -169,6 +176,13 @@ class Interface(QtWidgets.QWidget):
                 frame = cv2.Canny(frame, 100, 200)
             elif self.captureMode == 'gray':
                 frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            elif self.captureMode == 'blur':
+                # Convolution by an averaging kernel
+                kernelSize = 11
+                kernel = np.resize(np.array([1]*kernelSize**2), (kernelSize, kernelSize)) / kernelSize**2
+                frameBuffer = deepcopy(frame)
+                cv2.filter2D(frameBuffer, -1, kernel, frame, (-1, -1), 0, cv2.BORDER_DEFAULT)
+
             # Transmit image to GUI
             self.newImageSig.signal.emit(frame)
 
