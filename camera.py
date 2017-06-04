@@ -141,18 +141,13 @@ class Interface(QtWidgets.QWidget):
             # FIXME: check what the 'success' variable gets exactly
             time.sleep(0.05)
             success, frame = capture.read()
-
             # Operations on frame
             if self.captureMode == 'edges':
                 frame = cv2.Canny(frame, 100, 200)
             elif self.captureMode == 'gray':
                 frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-
             # Transmit image to GUI
             self.newImageSig.signal.emit(frame)
-
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
 
         # When everything done, release the capture
         capture.release()
