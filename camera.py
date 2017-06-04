@@ -1,3 +1,4 @@
+#!/usr/python3
 # Camera.py
 # This script open a qt window where one can display the computer's webcam stream. Basic treatments can be performed on
 # those images.
@@ -8,12 +9,13 @@
 # Base packages
 import os, sys
 import time
+import getopt
 from threading import Thread, Lock
 
 # Downloaded packages
 import numpy as np
 import cv2
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PySide import QtCore, QtGui
 
 # Global definitions
 SCREEN_RESOLUTION = [1920, 1080]
@@ -26,7 +28,6 @@ try:
 except AttributeError:
     PLATFORM = sys.platform
 print('Running on', PLATFORM)
-
 
 class QtSignal(QtCore.QObject):
     # FIXME: try to get rid of this (i.e. better understand Qt signal process)
@@ -159,11 +160,30 @@ class Interface(QtWidgets.QWidget):
 
     def quit(self):
         self.stopVideoCaptureThread()
-        quit()
-
+        exit(0)
 
 def main():
-    app = QtWidgets.QApplication(sys.argv)
+    # handle parameters for screen an video resolution
+    global SCREEN_RESOLUTION
+    global VIDEO_RESOLUTION
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], "hs:v:", "")
+    except getopt.GetoptError as err:
+        print(err)
+    for o,a in opts:
+        if o == "-s":
+            SCREEN_RESOLUTION = [ int(x) for x in a.split("x") ]
+        elif o == "-v":
+            VIDEO_RESOLUTION = [ int(x) for x in a.split("x") ]
+        elif o == "-h":
+            print("Usage:",sys.argv[0], "[options...]")
+            print("oOptions:")
+            print("-h               display help")
+            print("-s <int>x<int>   screen resolution")
+            print("-v <int>x<int>   video resolution")
+            sys.exit(0)
+
+    app = QtGui.QApplication(sys.argv)
     interface = Interface()
 
     sys.exit(app.exec_())
