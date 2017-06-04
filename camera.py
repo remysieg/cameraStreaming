@@ -139,8 +139,7 @@ class Interface(QtGui.QWidget):
 
     def quit(self):
         self.stopVideoCaptureThread()
-        quit()
-
+        exit(0)
 
 def main():
     # handle parameters for screen an video resolution
