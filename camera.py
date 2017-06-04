@@ -11,6 +11,7 @@ import os, sys
 import time
 import getopt
 from threading import Thread, Lock
+from copy import deepcopy
 
 # Downloaded packages
 import numpy as np
@@ -45,7 +46,7 @@ class QtSignal(QtCore.QObject):
 class Interface(QtWidgets.QWidget):
     def __init__(self):
         super(Interface, self).__init__()
-        self.size = [800, 600]
+        self.size = [850, 500]
         self.button_connect = None
         self.label_image = None
 
@@ -80,25 +81,31 @@ class Interface(QtWidgets.QWidget):
 
         checkbox_raw = QtWidgets.QCheckBox('Raw image', self)
         checkbox_raw.setChecked(True)
-        checkbox_raw.setGeometry(10, 130, 100, 30)
+        checkbox_raw.setGeometry(10, 130, 180, 30)
         checkbox_raw.stateChanged.connect(self.updateMode)
         checkboxGroup_mode.addButton(checkbox_raw)
 
         checkbox_gray = QtWidgets.QCheckBox('Gray image', self)
-        checkbox_gray.setGeometry(10, 170, 100, 30)
+        checkbox_gray.setGeometry(10, 170, 180, 30)
         checkbox_gray.stateChanged.connect(self.updateMode)
         checkboxGroup_mode.addButton(checkbox_gray)
 
         checkbox_edges = QtWidgets.QCheckBox('Canny edges detection', self)
-        checkbox_edges.setGeometry(10, 210, 100, 30)
+        checkbox_edges.setGeometry(10, 210, 180, 30)
         checkbox_edges.stateChanged.connect(self.updateMode)
         checkboxGroup_mode.addButton(checkbox_edges)
 
-        self.modeCheckBoxes = {'raw': checkbox_raw, 'gray': checkbox_gray, 'edges': checkbox_edges}
+        checkbox_blur = QtWidgets.QCheckBox('Blurred image', self)
+        checkbox_blur.setGeometry(10, 250, 180, 30)
+        checkbox_blur.stateChanged.connect(self.updateMode)
+        checkboxGroup_mode.addButton(checkbox_blur)
+
+        self.modeCheckBoxes = {'raw': checkbox_raw, 'gray': checkbox_gray, 'edges': checkbox_edges,
+                               'blur': checkbox_blur}
 
         # Init QLabel to display images
         self.label_image = QtWidgets.QLabel(self)
-        self.label_image.setGeometry(120, 10, 640, 480)
+        self.label_image.setGeometry(200, 10, 640, 480)
 
         self.show()
 
@@ -158,14 +165,24 @@ class Interface(QtWidgets.QWidget):
 
         while self.captureRunning:
             # Capture one frame
-            # FIXME: check what the 'success' variable gets exactly
             time.sleep(0.05)
             success, frame = capture.read()
+            if not success:
+                print('[videoCapture] No frame was captured')
+                continue
+
             # Operations on frame
             if self.captureMode == 'edges':
                 frame = cv2.Canny(frame, 100, 200)
             elif self.captureMode == 'gray':
                 frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            elif self.captureMode == 'blur':
+                # Convolution by an averaging kernel
+                kernelSize = 11
+                kernel = np.resize(np.array([1]*kernelSize**2), (kernelSize, kernelSize)) / kernelSize**2
+                frameBuffer = deepcopy(frame)
+                cv2.filter2D(frameBuffer, -1, kernel, frame, (-1, -1), 0, cv2.BORDER_DEFAULT)
+
             # Transmit image to GUI
             self.newImageSig.signal.emit(frame)
 
