@@ -98,13 +98,13 @@ class Interface(QtWidgets.QWidget):
                 self.captureMode = mode
 
     def updateImage(self, frame):
-        if self.captureMode == 'raw':
+        if len(frame.shape) == 3:
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             image = QtGui.QImage(frame, frame.shape[1], frame.shape[0], frame.shape[1]*3,
                                  QtGui.QImage.Format_RGB888)
             pixmap = QtGui.QPixmap(image)
             self.label_image.setPixmap(pixmap)
-        else:
+        elif len(frame.shape) == 1:
             # FIXME: make other modes work
             print('This mode is not supported')
             # image = QtGui.QImage(frame, frame.shape[1], frame.shape[0], frame.shape[1]*3,
