@@ -29,6 +29,7 @@ except AttributeError:
     PLATFORM = sys.platform
 print('Running on', PLATFORM)
 
+
 class QtSignal(QtCore.QObject):
     # FIXME: try to get rid of this (i.e. better understand Qt signal process)
     signal = QtCore.pyqtSignal(object)
@@ -162,6 +163,7 @@ class Interface(QtWidgets.QWidget):
         self.stopVideoCaptureThread()
         exit(0)
 
+
 def main():
     # handle parameters for screen an video resolution
     global SCREEN_RESOLUTION
@@ -170,14 +172,14 @@ def main():
         opts, args = getopt.getopt(sys.argv[1:], "hs:v:", "")
     except getopt.GetoptError as err:
         print(err)
-    for o,a in opts:
-        if o == "-s":
-            SCREEN_RESOLUTION = [ int(x) for x in a.split("x") ]
-        elif o == "-v":
-            VIDEO_RESOLUTION = [ int(x) for x in a.split("x") ]
-        elif o == "-h":
-            print("Usage:",sys.argv[0], "[options...]")
-            print("oOptions:")
+    for option, argument in opts:
+        if option == "-s":
+            SCREEN_RESOLUTION = [int(x) for x in argument.split("x")]
+        elif option == "-v":
+            VIDEO_RESOLUTION = [int(x) for x in argument.split("x")]
+        elif option == "-h":
+            print("Usage:", sys.argv[0], "[options...]")
+            print("Options:")
             print("-h               display help")
             print("-s <int>x<int>   screen resolution")
             print("-v <int>x<int>   video resolution")
