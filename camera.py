@@ -20,6 +20,8 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 # Global definitions
 SCREEN_RESOLUTION = [1920, 1080]
 VIDEO_RESOLUTION = [640, 480]
+
+# Get current platform and print it
 try:
     if os.uname()[1] == 'raspberrypi':
         PLATFORM = 'raspPi'
@@ -29,6 +31,7 @@ except AttributeError:
     PLATFORM = sys.platform
 print('Running on', PLATFORM)
 
+# Grayscale table
 grayScaleTable = []
 for i in range(0, 256):
     grayScaleTable.append(QtGui.qRgb(i, i, i))
@@ -40,7 +43,6 @@ class QtSignal(QtCore.QObject):
 
 
 class Interface(QtWidgets.QWidget):
-
     def __init__(self):
         super(Interface, self).__init__()
         self.size = [800, 600]
@@ -57,11 +59,13 @@ class Interface(QtWidgets.QWidget):
         self.initUI()
 
     def initUI(self):
+        # Init window
         self.setGeometry(int((SCREEN_RESOLUTION[0]-self.size[0])/2),
                          int((SCREEN_RESOLUTION[1]-self.size[1])/2),
                          self.size[0], self.size[1])
         self.setWindowTitle('Camera')
 
+        # Init buttons
         button_quit = QtWidgets.QPushButton('Quit', self)
         button_quit.setGeometry(10, 10, 100, 30)
         button_quit.clicked.connect(self.quit)
@@ -70,6 +74,7 @@ class Interface(QtWidgets.QWidget):
         self.button_connect.setGeometry(10, 50, 100, 30)
         self.button_connect.clicked.connect(self.connect)
 
+        # Init checkboxes group that will monitor image treatments (i.e. modes)
         checkboxGroup_mode = QtWidgets.QButtonGroup(self)
         checkboxGroup_mode.setObjectName('Treatment')
 
@@ -91,17 +96,20 @@ class Interface(QtWidgets.QWidget):
 
         self.modeCheckBoxes = {'raw': checkbox_raw, 'gray': checkbox_gray, 'edges': checkbox_edges}
 
+        # Init QLabel to display images
         self.label_image = QtWidgets.QLabel(self)
         self.label_image.setGeometry(120, 10, 640, 480)
 
         self.show()
 
     def updateMode(self):
+        """ Check the state of the checkboxes and update 'self.mode' accordingly """
         for mode, checkbox in self.modeCheckBoxes.items():
             if checkbox.checkState():
                 self.captureMode = mode
 
     def updateImage(self, frame):
+        """ Convert received <frame> (numpy.ndarray) to QImage, then QPixmap, and displayi it """
         if len(frame.shape) == 3:  # RGB image
             # Convert ndarray to QImage
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -119,17 +127,20 @@ class Interface(QtWidgets.QWidget):
         self.label_image.setPixmap(pixmap)
 
     def startvideoCaptureThread(self):
+        """ Properly start the capture thread """
         self.captureThread = Thread(None, self.videoCapture, 'thread-capture')
         self.captureThread.daemon = True
         self.captureThread.start()
 
     def stopVideoCaptureThread(self):
+        """ Properly stop teh capture thread"""
         if self.captureThread is not None:
             self.captureRunning = False
             self.captureThread.join()
             self.captureThread = None
 
     def connect(self):
+        """ start/stop the capture thread and update the connection button accordingly"""
         if self.button_connect.text() == 'Connect':
             self.startvideoCaptureThread()
             self.button_connect.setText('Disconnect')
@@ -138,6 +149,8 @@ class Interface(QtWidgets.QWidget):
             self.button_connect.setText('Connect')
 
     def videoCapture(self):
+        """ Loop of the capture thread
+            Use opencv to capture camera frames, treat them and pass them to the main thread """
         self.captureRunning = True
 
         print('Begin of Thread - videoCapture')
@@ -162,6 +175,7 @@ class Interface(QtWidgets.QWidget):
         print('End of thread - videoCapture')
 
     def quit(self):
+        """ Stop capture thread and quit application """
         self.stopVideoCaptureThread()
         exit(0)
 
