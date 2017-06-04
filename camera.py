@@ -29,6 +29,10 @@ except AttributeError:
     PLATFORM = sys.platform
 print('Running on', PLATFORM)
 
+grayScaleTable = []
+for i in range(0, 256):
+    grayScaleTable.append(QtGui.qRgb(i, i, i))
+
 
 class QtSignal(QtCore.QObject):
     # FIXME: try to get rid of this (i.e. better understand Qt signal process)
@@ -98,18 +102,21 @@ class Interface(QtWidgets.QWidget):
                 self.captureMode = mode
 
     def updateImage(self, frame):
-        if len(frame.shape) == 3:
+        if len(frame.shape) == 3:  # RGB image
+            # Convert ndarray to QImage
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             image = QtGui.QImage(frame, frame.shape[1], frame.shape[0], frame.shape[1]*3,
                                  QtGui.QImage.Format_RGB888)
-            pixmap = QtGui.QPixmap(image)
-            self.label_image.setPixmap(pixmap)
-        elif len(frame.shape) == 1:
-            # FIXME: make other modes work
-            print('This mode is not supported')
-            # image = QtGui.QImage(frame, frame.shape[1], frame.shape[0], frame.shape[1]*3,
-            #                      QtGui.QImage.Format_RGB888)
-            # pixmap = QtGui.QPixmap(image)
+
+        elif len(frame.shape) == 2:  # Grayscale image
+            # Convert ndarray to QImage
+            image = QtGui.QImage(frame, frame.shape[1], frame.shape[0],
+                                 QtGui.QImage.Format_Indexed8)
+            image.setColorTable(grayScaleTable)
+
+        # Pass image to QLabel to display it
+        pixmap = QtGui.QPixmap(image)
+        self.label_image.setPixmap(pixmap)
 
     def startvideoCaptureThread(self):
         self.captureThread = Thread(None, self.videoCapture, 'thread-capture')
