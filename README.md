@@ -7,7 +7,6 @@ The connect button open a new (opencv) window ad stream the webcam of the pc in 
 
 Next goals:
 - make it handle piCamera of raspberryPi
-- fix the edge and gray modes
 
 Long term goals:
 - access to the camera from a distant raspberry pi (through wifi connection)
