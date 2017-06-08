@@ -15,3 +15,5 @@ Next goals:
 
 Long term goals:
 - access to the camera from a distant raspberry pi (through wifi connection)
+
+Test (thierry)
