@@ -5,7 +5,7 @@
 This script open a (pyside) window with connect and quit buttons.
 The connect button open a new (opencv) window ad stream the webcam of the pc in it.
 
-Display command line options:
+Display command line [Remy Modif] options:
 ```bash
 python camera.py -h
 ```
