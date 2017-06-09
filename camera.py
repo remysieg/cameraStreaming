@@ -46,7 +46,7 @@ class QtSignal(QtCore.QObject):
 class Interface(QtWidgets.QWidget):
     def __init__(self):
         super(Interface, self).__init__()
-        self.size = [850, 500]
+        self.size = SCREEN_RESOLUTION
         self.button_connect = None
         self.label_image = None
 
@@ -90,15 +90,15 @@ class Interface(QtWidgets.QWidget):
         checkbox_gray.stateChanged.connect(self.updateMode)
         checkboxGroup_mode.addButton(checkbox_gray)
 
-        checkbox_edges = QtWidgets.QCheckBox('Canny edges detection', self)
-        checkbox_edges.setGeometry(10, 210, 180, 30)
-        checkbox_edges.stateChanged.connect(self.updateMode)
-        checkboxGroup_mode.addButton(checkbox_edges)
-
         checkbox_blur = QtWidgets.QCheckBox('Blurred image', self)
-        checkbox_blur.setGeometry(10, 250, 180, 30)
+        checkbox_blur.setGeometry(10, 210, 180, 30)
         checkbox_blur.stateChanged.connect(self.updateMode)
         checkboxGroup_mode.addButton(checkbox_blur)
+
+        checkbox_edges = QtWidgets.QCheckBox('Canny edges detection', self)
+        checkbox_edges.setGeometry(10, 250, 180, 30)
+        checkbox_edges.stateChanged.connect(self.updateMode)
+        checkboxGroup_mode.addButton(checkbox_edges)
 
         self.modeCheckBoxes = {'raw': checkbox_raw, 'gray': checkbox_gray, 'edges': checkbox_edges,
                                'blur': checkbox_blur}
