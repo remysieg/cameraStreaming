@@ -10,6 +10,7 @@
 import os, sys
 import time
 import getopt
+import math
 from threading import Thread, Lock
 from copy import deepcopy
 
@@ -46,13 +47,14 @@ class QtSignal(QtCore.QObject):
 class Interface(QtWidgets.QWidget):
     def __init__(self):
         super(Interface, self).__init__()
-        self.size = [850, 500]
+        self.size = SCREEN_RESOLUTION
         self.button_connect = None
         self.label_image = None
 
         self.captureThread = None
         self.captureRunning = False
         self.captureMode = 'raw'
+        self.cannyEdges = [50, 70]
 
         self.newImageSig = QtSignal()
         self.newImageSig.signal.connect(self.updateImage)
@@ -81,33 +83,43 @@ class Interface(QtWidgets.QWidget):
 
         checkbox_raw = QtWidgets.QCheckBox('Raw image', self)
         checkbox_raw.setChecked(True)
-        checkbox_raw.setGeometry(10, 130, 180, 30)
+        checkbox_raw.setGeometry(10, 130, 250, 30)
         checkbox_raw.stateChanged.connect(self.updateMode)
         checkboxGroup_mode.addButton(checkbox_raw)
 
         checkbox_gray = QtWidgets.QCheckBox('Gray image', self)
-        checkbox_gray.setGeometry(10, 170, 180, 30)
+        checkbox_gray.setGeometry(10, 170, 250, 30)
         checkbox_gray.stateChanged.connect(self.updateMode)
         checkboxGroup_mode.addButton(checkbox_gray)
 
+        checkbox_blur = QtWidgets.QCheckBox('Blurred image', self)
+        checkbox_blur.setGeometry(10, 210, 250, 30)
+        checkbox_blur.stateChanged.connect(self.updateMode)
+        checkboxGroup_mode.addButton(checkbox_blur)
+
         checkbox_edges = QtWidgets.QCheckBox('Canny edges detection', self)
-        checkbox_edges.setGeometry(10, 210, 180, 30)
+        checkbox_edges.setGeometry(10, 250, 250, 30)
         checkbox_edges.stateChanged.connect(self.updateMode)
         checkboxGroup_mode.addButton(checkbox_edges)
 
-        checkbox_blur = QtWidgets.QCheckBox('Blurred image', self)
-        checkbox_blur.setGeometry(10, 250, 180, 30)
-        checkbox_blur.stateChanged.connect(self.updateMode)
-        checkboxGroup_mode.addButton(checkbox_blur)
+        slider_cannyedgesvalue = QtWidgets.QSlider(QtCore.Qt.Horizontal, self)
+        slider_cannyedgesvalue.setGeometry(10,290,250,30)
+        slider_cannyedgesvalue.setValue(25)
+        slider_cannyedgesvalue.valueChanged[int].connect(self.changeValueSlider)
+
 
         self.modeCheckBoxes = {'raw': checkbox_raw, 'gray': checkbox_gray, 'edges': checkbox_edges,
                                'blur': checkbox_blur}
 
         # Init QLabel to display images
         self.label_image = QtWidgets.QLabel(self)
-        self.label_image.setGeometry(200, 10, 640, 480)
+        self.label_image.setGeometry(270, 10, 640, 480)
 
         self.show()
+
+    def changeValueSlider(self, value):
+        value *= 2
+        self.cannyEdges = [value, value+math.floor(value/5)]
 
     def updateMode(self):
         """ Check the state of the checkboxes and update 'self.mode' accordingly """
@@ -173,7 +185,7 @@ class Interface(QtWidgets.QWidget):
 
             # Operations on frame
             if self.captureMode == 'edges':
-                frame = cv2.Canny(frame, 100, 200)
+                frame = cv2.Canny(frame, self.cannyEdges[0], self.cannyEdges[1])
             elif self.captureMode == 'gray':
                 frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
             elif self.captureMode == 'blur':
