@@ -19,6 +19,9 @@ import numpy as np
 import cv2
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+# raspi packages
+import picamera
+
 # Global definitions
 SCREEN_RESOLUTION = [1920, 1080]
 VIDEO_RESOLUTION = [640, 480]
@@ -177,11 +180,20 @@ class Interface(QtWidgets.QWidget):
 
         while self.captureRunning:
             # Capture one frame
-            time.sleep(0.05)
-            success, frame = capture.read()
-            if not success:
-                print('[videoCapture] No frame was captured')
-                continue
+            #time.sleep(0.05)
+            #success, frame = capture.read()
+            #if not success:
+            #    print('[videoCapture] No frame was captured')
+            #    continue
+
+	    # Capture on raspi
+            with picamera.PiCamera() as camera:
+                time.sleep(0.05)
+                camera.resolution = (VIDEO_RESOLUTION[0], VIDEO_RESOLUTION[1])
+                camera.framerate = 24
+                image = np.empty((VIDEO_RESOLUTION[0] * VIDEO_RESOLUTION[1] * 3,), dtype=np.uint8)
+                camera.capture(image, 'bgr')
+                frame = image.reshape((VIDEO_RESOLUTION[0], VIDEO_RESOLUTION[1], 3))
 
             # Operations on frame
             if self.captureMode == 'edges':
