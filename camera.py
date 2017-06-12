@@ -191,9 +191,9 @@ class Interface(QtWidgets.QWidget):
                 time.sleep(0.05)
                 camera.resolution = (VIDEO_RESOLUTION[0], VIDEO_RESOLUTION[1])
                 camera.framerate = 24
-                image = np.empty((VIDEO_RESOLUTION[0] * VIDEO_RESOLUTION[1] * 3,), dtype=np.uint8)
+                image = np.empty((VIDEO_RESOLUTION[1] * VIDEO_RESOLUTION[0] * 3,), dtype=np.uint8)
                 camera.capture(image, 'bgr')
-                frame = image.reshape((VIDEO_RESOLUTION[0], VIDEO_RESOLUTION[1], 3))
+                frame = image.reshape((VIDEO_RESOLUTION[1], VIDEO_RESOLUTION[0], 3))
 
             # Operations on frame
             if self.captureMode == 'edges':
