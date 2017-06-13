@@ -1,6 +1,6 @@
 # cameraStreaming
 
------ Camera.py -----
+## ----- Camera.py -----
 
 This script open a (pyside) window with connect and quit buttons.
 The connect button open a new (opencv) window ad stream the webcam of the pc in it.
@@ -17,4 +17,3 @@ Next goals:
 Long term goals:
 - access to the camera from a distant raspberry pi (through wifi connection)
 
-test (thierry)
