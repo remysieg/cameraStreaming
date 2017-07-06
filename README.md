@@ -19,6 +19,7 @@ python camera.py -h
 
 - access to the camera from a distant raspberry pi (through wifi connection)
 
+# Server
 ## ----- server.py -----
 
 This script launches a python server. To access it, open your navigator and type:
