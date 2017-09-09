@@ -48,7 +48,7 @@ Part of the instructions comes from https://www.raspberrypi.org/forums/viewtopic
 
 ### Next goals:
 
-- Solve bug on raspberryPi: for now, index.py is only displayed and not executed. though it is when the server run locally.
+- Link scripts to ROS for communication.
 
 ### Long term goals:
 
