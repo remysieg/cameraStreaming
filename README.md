@@ -20,15 +20,31 @@ python camera.py -h
 - access to the camera from a distant raspberry pi (through wifi connection)
 
 # Server
-## ----- server.py -----
+## ----- server_apache2.py -----
+This script is runned as cgi under apache2 server. To access it, open your navigator and type:
+192.168.0.XX:/cgi-bin/server_apache2.py (server running on raspberryPi)
 
-This script launches a python server. To access it, open your navigator and type:
-- localhost:8888/index.py (server running on local)
-- 192.168.0.XX:8888/index.py (server running on raspberryPi)
+## ----- listener.py -----
+This script is runned as cgi under apache2 server and collects informations from server_apache2.py- It is charged automatically when you click on "submit" on the server_apache2 page.
 
-Type Ctrl-C to close it.
-
-Comment: one line to change in server.py depending if the server is running locally or on raspberryPi (indicated in the code).
+## Installation:
+Get apache2:
+```
+sudo apt-get install apache2
+```
+Modify the config file: /etc/apache2/conf-enabled/serve-cgi-bin.conf:
+```
+ScriptAlias /cgi-in/ /usr/lib/cgi-bin/            # Change to:  ScriptAlias /cgi-in/ /home/pi/hopiro/cgi-bin/ (folder where you will place your python code)
+<Directory "usr/lib/cgi-bin">                     # Change to:  <Directory "/home/pi/hopiro/cgi-bin/">
+             ... ...
+              AddHandler cgi-script .py           # add this line (there is a blank between cgi-script and .py)
+</Directory>
+```
+Restart apache2:
+```
+sudo service apache2 restart
+```
+Part of the instructions comes from https://www.raspberrypi.org/forums/viewtopic.php?f=28&t=155229#
 
 ### Next goals:
 
